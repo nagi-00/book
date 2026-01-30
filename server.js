@@ -1,3 +1,12 @@
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(__dirname));
+
+
 import express from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
@@ -59,3 +68,4 @@ app.post("/addBook", async (req, res) => {
 });
 
 app.listen(3000);
+
