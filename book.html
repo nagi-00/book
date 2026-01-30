@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>Book Widget</title>
+<style>
+:root {
+  --bg: #e6e6e6;
+  --card: #ffffff;
+  --accent: #4f6ef7;
+  --text: #222;
+  --muted: #888;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: var(--bg);
+  font-family: system-ui, sans-serif;
+}
+
+.scene {
+  width: 320px;
+  perspective: 1000px;
+}
+
+.card {
+  width: 100%;
+  min-height: 260px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  background: var(--card);
+  border-radius: 20px;
+  padding: 16px;
+  box-sizing: border-box;
+  backface-visibility: hidden;
+}
+
+.back {
+  transform: rotateY(180deg);
+}
+
+.header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.header input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.gear {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.result {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  cursor: pointer;
+}
+
+.result img {
+  width: 42px;
+  height: 56px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.author {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.add {
+  margin-top: 12px;
+  text-align: right;
+}
+
+.add button {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* back */
+.back h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.back label {
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+  margin-top: 10px;
+}
+
+.back input {
+  width: 100%;
+}
+
+.back button {
+  margin-top: 16px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+<div class="scene">
+  <div class="card" id="card">
+    <!-- front -->
+    <div class="face front">
+      <div class="header">
+        <input id="query" placeholder="책 제목" />
+        <div class="gear" onclick="flip()">⚙</div>
+      </div>
+
+      <div id="results"></div>
+
+      <div class="add" id="add" style="display:none">
+        <button onclick="addToNotion()">노션에 추가</button>
+      </div>
+    </div>
+
+    <!-- back -->
+    <div class="face back">
+      <h4>Theme</h4>
+      <label>배경</label>
+      <input type="color" onchange="setVar('--bg', this.value)" />
+      <label>카드</label>
+      <input type="color" onchange="setVar('--card', this.value)" />
+      <label>포인트</label>
+      <input type="color" onchange="setVar('--accent', this.value)" />
+      <button onclick="flip()">돌아가기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let selected = null;
+
+function flip() {
+  document.getElementById("card").classList.toggle("flipped");
+}
+
+function setVar(name, value) {
+  document.documentElement.style.setProperty(name, value);
+}
+
+async function searchBook() {
+  const q = query.value.trim();
+  if (!q) return;
+
+  const res = await fetch(`/search?query=${encodeURIComponent(q)}`);
+  const books = await res.json();
+
+  results.innerHTML = "";
+  selected = null;
+  add.style.display = "none";
+
+  books.forEach(b => {
+    const el = document.createElement("div");
+    el.className = "result";
+    el.innerHTML = `
+      <img src="${b.cover}">
+      <div>
+        <div class="title">${b.title}</div>
+        <div class="author">${b.author}</div>
+      </div>`;
+    el.onclick = () => {
+      selected = b;
+      add.style.display = "block";
+    };
+    results.appendChild(el);
+  });
+}
+
+query.addEventListener("keydown", e => {
+  if (e.key === "Enter") searchBook();
+});
+
+async function addToNotion() {
+  if (!selected) return;
+  await fetch("/addBook", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(selected)
+  });
+  alert("추가했어.");
+}
+</script>
+</body>
+</html>
