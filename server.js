@@ -68,11 +68,9 @@ app.post("/addBook", async (req, res) => {
 
   try {
     const properties = {
-      // 제목은 페이지 제목 (title 속성)
       "title": {
         title: [{ text: { content: title || "" } }]
       },
-      // author는 텍스트 속성
       "author": {
         rich_text: [{ text: { content: author || "" } }]
       }
