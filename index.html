@@ -54,9 +54,9 @@
       border-radius: 50%;
     }
 
-    .traffic-light.red { background: #FFACA3; }
-    .traffic-light.yellow { background: #FFE9A3; }
-    .traffic-light.green { background: #B8E0A8; }
+    .traffic-light.red { background: #e8bcbc; }
+    .traffic-light.yellow { background: #f4f4bd; }
+    .traffic-light.green { background: #c5e8c5; }
 
     .titlebar-title {
       position: absolute;
@@ -424,7 +424,7 @@
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
         </button>
-        <button class="titlebar-btn" id="sendBtn" onclick="addToNotionFromList()" style="display: none;" title="노션에 추가">
+        <button class="titlebar-btn" id="sendBtn" onclick="addToNotion()" style="display: none;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
@@ -493,6 +493,13 @@
   <div class="toast" id="toast"></div>
 
   <script>
+    // 설정
+    const CONFIG = {
+      ALADIN_TTB_KEY: 'ttb1995dianalee0217002',
+      NOTION_TOKEN: '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',
+      NOTION_DB_ID: '2f886273-8e61-818c-9326-000b91cdcfe8'
+    };
+
     let books = [];
     let selectedBook = null;
     let currentView = 'list';
@@ -511,26 +518,52 @@
       }
     }
 
-    async function searchBooks() {
+    // JSONP로 Aladin API 호출
+    function searchBooks() {
       const query = document.getElementById('searchInput').value.trim();
       if (!query) return;
 
       showLoading();
 
-      try {
-        const res = await fetch(`/search?query=${encodeURIComponent(query)}`);
-        books = await res.json();
+      const callbackName = 'aladinCallback_' + Date.now();
+      const url = 'https://www.aladin.co.kr/ttb/api/ItemSearch.aspx' +
+        `?ttbkey=${CONFIG.ALADIN_TTB_KEY}` +
+        `&Query=${encodeURIComponent(query)}` +
+        '&QueryType=Title&MaxResults=10&SearchTarget=Book&output=js&Version=20131101' +
+        `&callback=${callbackName}`;
 
-        if (books.error || books.length === 0) {
+      window[callbackName] = function(data) {
+        delete window[callbackName];
+        document.body.removeChild(script);
+
+        if (!data || !data.item || data.item.length === 0) {
           showEmpty('검색 결과가 없습니다');
           return;
         }
 
+        books = data.item.map(b => ({
+          isbn: b.isbn13 || b.isbn,
+          title: b.title,
+          author: b.author,
+          publisher: b.publisher,
+          pubDate: b.pubDate,
+          cover: b.cover?.replace('coversum', 'cover500') || b.cover,
+          description: b.description,
+          categoryName: b.categoryName,
+          link: b.link
+        }));
+
         renderBooks();
-      } catch (err) {
-        console.error('Search error:', err);
+      };
+
+      const script = document.createElement('script');
+      script.src = url;
+      script.onerror = function() {
+        delete window[callbackName];
+        document.body.removeChild(script);
         showEmpty('검색 중 오류가 발생했습니다');
-      }
+      };
+      document.body.appendChild(script);
     }
 
     function showLoading() {
@@ -623,28 +656,73 @@
       }
     }
 
-    async function addToNotionFromList() {
-      await addToNotion();
-    }
-
     async function addToNotion() {
       if (!selectedBook) return;
 
+      const { title, author, cover, description } = selectedBook;
+
+      const properties = {
+        "title": {
+          title: [{ text: { content: title || "" } }]
+        },
+        "author": {
+          rich_text: [{ text: { content: author || "" } }]
+        }
+      };
+
+      if (cover) {
+        properties["cover"] = {
+          files: [{
+            type: "external",
+            name: "cover.jpg",
+            external: { url: cover }
+          }]
+        };
+      }
+
+      const body = {
+        parent: { database_id: CONFIG.NOTION_DB_ID },
+        properties: properties
+      };
+
+      if (cover) {
+        body.cover = {
+          type: "external",
+          external: { url: cover }
+        };
+      }
+
+      if (description) {
+        body.children = [{
+          object: "block",
+          type: "quote",
+          quote: {
+            rich_text: [{ type: "text", text: { content: description.slice(0, 2000) } }]
+          }
+        }];
+      }
+
       try {
-        const res = await fetch('/addBook', {
+        const res = await fetch('https://api.notion.com/v1/pages', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(selectedBook)
+          headers: {
+            'Authorization': `Bearer ${CONFIG.NOTION_TOKEN}`,
+            'Content-Type': 'application/json',
+            'Notion-Version': '2022-06-28'
+          },
+          body: JSON.stringify(body)
         });
 
         const data = await res.json();
 
-        if (data.ok) {
+        if (res.ok) {
           showToast('노션에 추가되었습니다!', 'success');
         } else {
-          showToast(data.error || '추가 실패', 'error');
+          console.error('Notion error:', data);
+          showToast(data.message || '추가 실패', 'error');
         }
       } catch (err) {
+        console.error('Add error:', err);
         showToast('추가 중 오류 발생', 'error');
       }
     }
