@@ -31,12 +31,10 @@ app.get("/search", async (req, res) => {
     const r = await fetch(url);
     const text = await r.text();
 
-    // 알라딘 API는 JSONP 형식으로 응답할 수 있으므로 파싱
     let data;
     try {
       data = JSON.parse(text);
     } catch {
-      // JSONP 형식인 경우 처리
       const match = text.match(/\{[\s\S]*\}/);
       if (match) {
         data = JSON.parse(match[0]);
@@ -64,75 +62,34 @@ app.get("/search", async (req, res) => {
   }
 });
 
-// 도서 상세 정보 API
-app.get("/detail", async (req, res) => {
-  const isbn = req.query.isbn;
-  const url =
-    "https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx" +
-    `?ttbkey=${process.env.ALADIN_TTB_KEY}` +
-    `&itemIdType=ISBN13&ItemId=${isbn}` +
-    "&output=js&Version=20131101&OptResult=ebookList,usedList,reviewList";
-
-  try {
-    const r = await fetch(url);
-    const text = await r.text();
-
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      const match = text.match(/\{[\s\S]*\}/);
-      if (match) {
-        data = JSON.parse(match[0]);
-      } else {
-        throw new Error("Invalid response format");
-      }
-    }
-
-    const b = data.item?.[0];
-
-    if (!b) {
-      return res.status(404).json({ error: "책을 찾을 수 없습니다" });
-    }
-
-    res.json({
-      isbn: b.isbn13 || b.isbn,
-      title: b.title,
-      author: b.author,
-      publisher: b.publisher,
-      pubDate: b.pubDate,
-      cover: b.cover?.replace("coversum", "cover500") || b.cover,
-      description: b.description,
-      categoryName: b.categoryName,
-      link: b.link,
-      priceStandard: b.priceStandard,
-      priceSales: b.priceSales,
-      customerReviewRank: b.customerReviewRank
-    });
-  } catch (err) {
-    console.error("Detail error:", err);
-    res.status(500).json({ error: "상세 정보 로드 실패" });
-  }
-});
-
 // 노션에 도서 추가
 app.post("/addBook", async (req, res) => {
   const { title, author, cover, description } = req.body;
 
   try {
     const properties = {
+      // 제목은 페이지 제목 (title 속성)
       "title": {
         title: [{ text: { content: title || "" } }]
       },
+      // author는 텍스트 속성
       "author": {
         rich_text: [{ text: { content: author || "" } }]
       }
     };
 
-    // cover 속성 추가 (URL 타입)
+    // cover는 파일과 미디어 (files) 타입
     if (cover) {
       properties["cover"] = {
-        url: cover
+        files: [
+          {
+            type: "external",
+            name: "cover.jpg",
+            external: {
+              url: cover
+            }
+          }
+        ]
       };
     }
 
