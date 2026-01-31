@@ -25,7 +25,7 @@ app.get("/search", async (req, res) => {
     "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
     `?ttbkey=${process.env.ALADIN_TTB_KEY}` +
     `&Query=${encodeURIComponent(q)}` +
-    "&QueryType=Title&MaxResults=10&SearchTarget=Book&output=js&Version=20131101";
+    "&QueryType=Title&MaxResults=10&SearchTarget=Book&output=json&Version=20131101";
 
   try {
     const r = await fetch(url);
@@ -135,3 +135,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
