@@ -2,225 +2,703 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<title>Book Widget</title>
+<title>Book Search Widget</title>
 <style>
 :root {
-  --bg: #e6e6e6;
+  --bg: #f5f5f7;
   --card: #ffffff;
-  --accent: #4f6ef7;
-  --text: #222;
+  --primary: #F7C8D6;
+  --accent: #FDD5DF;
+  --text: #333;
   --muted: #888;
+  --section-title: #666;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f7 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 20px;
-  background: var(--bg);
-  font-family: system-ui, sans-serif;
 }
 
-.scene {
-  width: 320px;
-  perspective: 1000px;
-}
-
-.card {
+.window {
   width: 100%;
-  min-height: 260px;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.6s;
-}
-
-.card.flipped {
-  transform: rotateY(180deg);
-}
-
-.face {
-  position: absolute;
-  inset: 0;
+  max-width: 520px;
   background: var(--card);
-  border-radius: 20px;
-  padding: 16px;
-  box-sizing: border-box;
-  backface-visibility: hidden;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.1),
+    0 10px 40px rgba(0,0,0,0.15),
+    0 2px 10px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
-.back {
-  transform: rotateY(180deg);
+/* Title Bar */
+.titlebar {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, #f6f6f6 0%, #e8e8e8 100%);
+  border-bottom: 1px solid #d1d1d1;
 }
 
-.header {
+.traffic-lights {
   display: flex;
   gap: 8px;
-  align-items: center;
 }
 
-.header input {
+.traffic-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.traffic-light.close { background: #ff5f57; }
+.traffic-light.minimize { background: #febc2e; }
+.traffic-light.maximize { background: #28c840; }
+
+.titlebar-title {
   flex: 1;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4a4a4a;
+}
+
+.titlebar-actions {
+  display: flex;
+  gap: 12px;
+  color: #888;
+}
+
+.titlebar-actions span {
+  cursor: pointer;
   font-size: 14px;
 }
 
-.gear {
-  cursor: pointer;
-  color: var(--muted);
-  font-size: 18px;
+/* Content */
+.content {
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
-.result {
+.section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--section-title);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+/* Color Presets */
+.color-presets {
   display: flex;
   gap: 12px;
-  padding: 8px 0;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.color-preset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   cursor: pointer;
 }
 
-.result img {
-  width: 42px;
-  height: 56px;
-  border-radius: 6px;
-  object-fit: cover;
+.color-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  position: relative;
 }
 
-.title {
-  font-size: 13px;
+.color-circle::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.color-preset.selected .color-circle::after {
+  border-color: var(--primary);
+}
+
+.color-preset.selected .color-circle::before {
+  content: '✓';
+  font-size: 18px;
+  color: #666;
+}
+
+.color-preset span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Custom Colors */
+.custom-colors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.custom-card {
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.custom-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.custom-label {
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
 }
 
-.author {
-  font-size: 12px;
+.custom-hex {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: monospace;
+}
+
+.custom-preview {
+  height: 60px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.custom-preview:hover {
+  transform: scale(1.02);
+}
+
+.custom-card input[type="color"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Search Section */
+.search-section {
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.search-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.search-header h3 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--section-title);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.search-box {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--card);
+  font-size: 14px;
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.search-box input::placeholder {
   color: var(--muted);
 }
 
-.add {
-  margin-top: 12px;
-  text-align: right;
+.search-box input:focus {
+  outline: 2px solid var(--primary);
 }
 
-.add button {
-  background: none;
+.search-btn {
+  padding: 12px 20px;
   border: none;
-  color: var(--accent);
-  font-size: 13px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
-/* back */
-.back h4 {
-  margin: 0 0 12px;
+.search-btn:hover {
+  background: var(--accent);
+  transform: scale(1.02);
+}
+
+/* Results */
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--card);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.result-item:hover {
+  transform: translateX(4px);
+}
+
+.result-item.selected {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(247,200,214,0.1) 0%, rgba(253,213,223,0.1) 100%);
+}
+
+.result-cover {
+  width: 48px;
+  height: 64px;
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.result-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.result-title {
   font-size: 14px;
   font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.back label {
+.result-author {
   font-size: 12px;
   color: var(--muted);
-  display: block;
-  margin-top: 10px;
 }
 
-.back input {
-  width: 100%;
+.result-check {
+  display: flex;
+  align-items: center;
+  color: var(--primary);
+  font-size: 20px;
+  opacity: 0;
+  transition: opacity 0.2s;
 }
 
-.back button {
+.result-item.selected .result-check {
+  opacity: 1;
+}
+
+/* Add Button */
+.add-section {
   margin-top: 16px;
+  display: none;
+}
+
+.add-section.visible {
+  display: block;
+}
+
+.add-btn {
+  width: 100%;
+  padding: 14px;
   border: none;
-  background: var(--accent);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
   color: #fff;
-  padding: 6px 10px;
-  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(247,200,214,0.4);
+}
+
+.add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
+.empty-state .icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 13px;
+}
+
+/* Loading */
+.loading {
+  display: none;
+  text-align: center;
+  padding: 20px;
+}
+
+.loading.visible {
+  display: block;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--bg);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--text);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 1000;
+}
+
+.toast.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.toast.success {
+  background: #28c840;
+}
+
+.toast.error {
+  background: #ff5f57;
 }
 </style>
 </head>
 
 <body>
-<div class="scene">
-  <div class="card" id="card">
-    <!-- front -->
-    <div class="face front">
-      <div class="header">
-        <input id="query" placeholder="책 제목" />
-        <div class="gear" onclick="flip()">⚙</div>
-      </div>
+<div class="window">
+  <div class="titlebar">
+    <div class="traffic-lights">
+      <div class="traffic-light close"></div>
+      <div class="traffic-light minimize"></div>
+      <div class="traffic-light maximize"></div>
+    </div>
+    <div class="titlebar-title">Book Search</div>
+    <div class="titlebar-actions">
+      <span>→</span>
+      <span>🔍</span>
+    </div>
+  </div>
 
-      <div id="results"></div>
-
-      <div class="add" id="add" style="display:none">
-        <button onclick="addToNotion()">노션에 추가</button>
+  <div class="content">
+    <!-- Color Presets -->
+    <div class="section">
+      <div class="section-title">Color</div>
+      <div class="color-presets">
+        <div class="color-preset selected" data-primary="#F7C8D6" data-accent="#FDD5DF" onclick="selectPreset(this)">
+          <div class="color-circle" style="background: #F7C8D6;"></div>
+          <span>Pink</span>
+        </div>
+        <div class="color-preset" data-primary="#FFCBA4" data-accent="#FFE0C4" onclick="selectPreset(this)">
+          <div class="color-circle" style="background: #FFCBA4;"></div>
+          <span>Coral</span>
+        </div>
+        <div class="color-preset" data-primary="#E0E0E0" data-accent="#F0F0F0" onclick="selectPreset(this)">
+          <div class="color-circle" style="background: #E0E0E0;"></div>
+          <span>White</span>
+        </div>
+        <div class="color-preset" data-primary="#F5E6A3" data-accent="#FFF4C4" onclick="selectPreset(this)">
+          <div class="color-circle" style="background: #F5E6A3;"></div>
+          <span>Yellow</span>
+        </div>
+        <div class="color-preset" data-primary="#666666" data-accent="#888888" onclick="selectPreset(this)">
+          <div class="color-circle" style="background: #666666;"></div>
+          <span>Gray</span>
+        </div>
+        <div class="color-preset" data-primary="#B8E6B8" data-accent="#D4F4D4" onclick="selectPreset(this)">
+          <div class="color-circle" style="background: #B8E6B8;"></div>
+          <span>Green</span>
+        </div>
+        <div class="color-preset" data-primary="#D4B8E0" data-accent="#E8D4F0" onclick="selectPreset(this)">
+          <div class="color-circle" style="background: #D4B8E0;"></div>
+          <span>Violet</span>
+        </div>
+        <div class="color-preset" data-primary="#A8C8E8" data-accent="#C4DCF4" onclick="selectPreset(this)">
+          <div class="color-circle" style="background: #A8C8E8;"></div>
+          <span>Blue</span>
+        </div>
       </div>
     </div>
 
-    <!-- back -->
-    <div class="face back">
-      <h4>Theme</h4>
-      <label>배경</label>
-      <input type="color" onchange="setVar('--bg', this.value)" />
-      <label>카드</label>
-      <input type="color" onchange="setVar('--card', this.value)" />
-      <label>포인트</label>
-      <input type="color" onchange="setVar('--accent', this.value)" />
-      <button onclick="flip()">돌아가기</button>
+    <!-- Custom Colors -->
+    <div class="section">
+      <div class="section-title">Custom</div>
+      <div class="custom-colors">
+        <div class="custom-card">
+          <div class="custom-header">
+            <span class="custom-label">Primary</span>
+            <span class="custom-hex" id="primaryHex">#F7C8D6</span>
+          </div>
+          <div class="custom-preview" id="primaryPreview" style="background: var(--primary);" onclick="document.getElementById('primaryPicker').click()"></div>
+          <input type="color" id="primaryPicker" value="#F7C8D6" onchange="setCustomColor('primary', this.value)">
+        </div>
+        <div class="custom-card">
+          <div class="custom-header">
+            <span class="custom-label">Accent</span>
+            <span class="custom-hex" id="accentHex">#FDD5DF</span>
+          </div>
+          <div class="custom-preview" id="accentPreview" style="background: var(--accent);" onclick="document.getElementById('accentPicker').click()"></div>
+          <input type="color" id="accentPicker" value="#FDD5DF" onchange="setCustomColor('accent', this.value)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="section">
+      <div class="search-section">
+        <div class="search-header">
+          <h3>Book Search</h3>
+        </div>
+
+        <div class="search-box">
+          <input type="text" id="query" placeholder="책 제목을 입력하세요..." />
+          <button class="search-btn" onclick="searchBook()">검색</button>
+        </div>
+
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+        </div>
+
+        <div class="results" id="results">
+          <div class="empty-state" id="emptyState">
+            <div class="icon">📚</div>
+            <p>책을 검색해보세요</p>
+          </div>
+        </div>
+
+        <div class="add-section" id="addSection">
+          <button class="add-btn" id="addBtn" onclick="addToNotion()">
+            노션에 추가하기
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
 let selected = null;
 
-function flip() {
-  document.getElementById("card").classList.toggle("flipped");
+// Color Preset Selection
+function selectPreset(el) {
+  document.querySelectorAll('.color-preset').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+
+  const primary = el.dataset.primary;
+  const accent = el.dataset.accent;
+
+  setColors(primary, accent);
 }
 
-function setVar(name, value) {
-  document.documentElement.style.setProperty(name, value);
+function setColors(primary, accent) {
+  document.documentElement.style.setProperty('--primary', primary);
+  document.documentElement.style.setProperty('--accent', accent);
+
+  document.getElementById('primaryPicker').value = primary;
+  document.getElementById('accentPicker').value = accent;
+  document.getElementById('primaryHex').textContent = primary.toUpperCase();
+  document.getElementById('accentHex').textContent = accent.toUpperCase();
+  document.getElementById('primaryPreview').style.background = primary;
+  document.getElementById('accentPreview').style.background = accent;
 }
 
+function setCustomColor(type, value) {
+  document.querySelectorAll('.color-preset').forEach(p => p.classList.remove('selected'));
+
+  document.documentElement.style.setProperty(`--${type}`, value);
+  document.getElementById(`${type}Hex`).textContent = value.toUpperCase();
+  document.getElementById(`${type}Preview`).style.background = value;
+}
+
+// Search
 async function searchBook() {
-  const q = query.value.trim();
+  const q = document.getElementById('query').value.trim();
   if (!q) return;
 
-  const res = await fetch(`/search?query=${encodeURIComponent(q)}`);
-  const books = await res.json();
+  const loading = document.getElementById('loading');
+  const results = document.getElementById('results');
+  const emptyState = document.getElementById('emptyState');
+  const addSection = document.getElementById('addSection');
 
-  results.innerHTML = "";
+  loading.classList.add('visible');
+  results.innerHTML = '';
+  addSection.classList.remove('visible');
   selected = null;
-  add.style.display = "none";
 
-  books.forEach(b => {
-    const el = document.createElement("div");
-    el.className = "result";
-    el.innerHTML = `
-      <img src="${b.cover}">
-      <div>
-        <div class="title">${b.title}</div>
-        <div class="author">${b.author}</div>
-      </div>`;
-    el.onclick = () => {
-      selected = b;
-      add.style.display = "block";
-    };
-    results.appendChild(el);
-  });
+  try {
+    const res = await fetch(`/search?query=${encodeURIComponent(q)}`);
+    const books = await res.json();
+
+    loading.classList.remove('visible');
+
+    if (books.length === 0) {
+      results.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">🔍</div>
+          <p>검색 결과가 없습니다</p>
+        </div>
+      `;
+      return;
+    }
+
+    books.forEach((book, index) => {
+      const el = document.createElement('div');
+      el.className = 'result-item';
+      el.innerHTML = `
+        <img class="result-cover" src="${book.cover}" alt="cover" />
+        <div class="result-info">
+          <div class="result-title">${book.title}</div>
+          <div class="result-author">${book.author}</div>
+        </div>
+        <div class="result-check">✓</div>
+      `;
+      el.onclick = () => selectBook(el, book);
+      results.appendChild(el);
+    });
+  } catch (error) {
+    loading.classList.remove('visible');
+    showToast('검색 중 오류가 발생했습니다', 'error');
+  }
 }
 
-query.addEventListener("keydown", e => {
-  if (e.key === "Enter") searchBook();
-});
+function selectBook(el, book) {
+  document.querySelectorAll('.result-item').forEach(item => item.classList.remove('selected'));
+  el.classList.add('selected');
+  selected = book;
+  document.getElementById('addSection').classList.add('visible');
+}
 
+// Add to Notion
 async function addToNotion() {
   if (!selected) return;
-  await fetch("/addBook", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(selected)
-  });
-  alert("추가했어.");
+
+  const btn = document.getElementById('addBtn');
+  btn.disabled = true;
+  btn.textContent = '추가 중...';
+
+  try {
+    const res = await fetch('/addBook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(selected)
+    });
+
+    if (res.ok) {
+      showToast('노션에 추가되었습니다!', 'success');
+      document.querySelectorAll('.result-item').forEach(item => item.classList.remove('selected'));
+      document.getElementById('addSection').classList.remove('visible');
+      selected = null;
+    } else {
+      throw new Error('Failed');
+    }
+  } catch (error) {
+    showToast('추가 중 오류가 발생했습니다', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '노션에 추가하기';
+  }
 }
+
+// Toast
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `toast ${type} visible`;
+
+  setTimeout(() => {
+    toast.classList.remove('visible');
+  }, 3000);
+}
+
+// Enter key search
+document.getElementById('query').addEventListener('keydown', e => {
+  if (e.key === 'Enter') searchBook();
+});
 </script>
 </body>
 </html>
