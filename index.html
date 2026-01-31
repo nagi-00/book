@@ -3,25 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Book Search Widget</title>
+  <title>Bookshelves</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #f5f5f7;
-      --card: #ffffff;
-      --accent: #6366f1;
-      --accent-hover: #4f46e5;
-      --text: #1a1a1a;
-      --text-secondary: #6b7280;
-      --border: #e5e7eb;
-      --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-      --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.12);
-      --radius: 16px;
-      --radius-sm: 10px;
-    }
-
     * {
       margin: 0;
       padding: 0;
@@ -29,145 +15,161 @@
     }
 
     body {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-      background: var(--bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #E8E8ED;
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 24px;
+      align-items: center;
+      padding: 40px 20px;
     }
 
-    .widget {
+    .window {
       width: 100%;
-      max-width: 420px;
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      max-width: 480px;
+      background: #FFFFFF;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
       overflow: hidden;
     }
 
-    .header {
-      padding: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .header-top {
+    /* Title Bar */
+    .titlebar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 600;
-      font-size: 15px;
-      color: var(--text);
-    }
-
-    .logo-icon {
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 14px;
-    }
-
-    .settings-btn {
-      width: 32px;
-      height: 32px;
-      border: none;
-      background: var(--bg);
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      transition: all 0.2s;
-    }
-
-    .settings-btn:hover {
-      background: var(--border);
-      color: var(--text);
-    }
-
-    .search-box {
+      padding: 12px 16px;
+      background: #FFFFFF;
+      border-bottom: 1px solid #F0F0F0;
       position: relative;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 8px;
+    }
+
+    .traffic-light {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .traffic-light.red { background: #FF5F56; }
+    .traffic-light.yellow { background: #FFBD2E; }
+    .traffic-light.green { background: #27C93F; }
+
+    .titlebar-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      font-weight: 500;
+      color: #1D1D1F;
+    }
+
+    .titlebar-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .titlebar-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #86868B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+
+    .titlebar-btn:hover {
+      color: #1D1D1F;
+    }
+
+    /* Search Panel */
+    .search-panel {
+      display: none;
+      padding: 16px;
+      background: #FAFAFA;
+      border-bottom: 1px solid #F0F0F0;
+    }
+
+    .search-panel.active {
+      display: block;
     }
 
     .search-input {
       width: 100%;
-      padding: 12px 16px 12px 44px;
-      border: 2px solid var(--border);
-      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      border: 1px solid #E0E0E0;
+      border-radius: 8px;
       font-size: 14px;
       font-family: inherit;
-      transition: all 0.2s;
-      background: var(--bg);
+      background: #FFFFFF;
+      transition: border-color 0.2s;
     }
 
     .search-input:focus {
       outline: none;
-      border-color: var(--accent);
-      background: var(--card);
+      border-color: #007AFF;
     }
 
     .search-input::placeholder {
-      color: var(--text-secondary);
+      color: #86868B;
     }
 
-    .search-icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-secondary);
-      pointer-events: none;
-    }
-
+    /* Content */
     .content {
-      max-height: 400px;
+      height: 420px;
       overflow-y: auto;
+      background: #FFFFFF;
     }
 
     .content::-webkit-scrollbar {
-      width: 6px;
+      width: 8px;
     }
 
     .content::-webkit-scrollbar-track {
-      background: transparent;
+      background: #F5F5F7;
     }
 
     .content::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 3px;
+      background: #C7C7CC;
+      border-radius: 4px;
     }
 
+    .content::-webkit-scrollbar-thumb:hover {
+      background: #A1A1A6;
+    }
+
+    /* Empty State */
     .empty-state {
-      padding: 48px 24px;
-      text-align: center;
-      color: var(--text-secondary);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #86868B;
+      padding: 40px;
     }
 
     .empty-icon {
       font-size: 48px;
-      margin-bottom: 12px;
-      opacity: 0.5;
+      margin-bottom: 16px;
+      opacity: 0.6;
     }
 
     .empty-text {
       font-size: 14px;
+      text-align: center;
     }
 
-    .results {
+    /* Book List */
+    .book-list {
       padding: 8px;
     }
 
@@ -175,26 +177,21 @@
       display: flex;
       gap: 14px;
       padding: 12px;
-      border-radius: var(--radius-sm);
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background 0.15s;
     }
 
     .book-item:hover {
-      background: var(--bg);
-    }
-
-    .book-item.selected {
-      background: rgba(99, 102, 241, 0.08);
-      border: 1px solid rgba(99, 102, 241, 0.2);
+      background: #F5F5F7;
     }
 
     .book-cover {
-      width: 56px;
-      height: 80px;
-      border-radius: 6px;
+      width: 48px;
+      height: 68px;
+      border-radius: 4px;
       object-fit: cover;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      background: #F0F0F0;
       flex-shrink: 0;
     }
 
@@ -208,355 +205,34 @@
 
     .book-title {
       font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
+      font-weight: 500;
+      color: #1D1D1F;
       margin-bottom: 4px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      line-height: 1.4;
     }
 
     .book-author {
       font-size: 12px;
-      color: var(--text-secondary);
-      margin-bottom: 4px;
-    }
-
-    .book-meta {
-      font-size: 11px;
-      color: var(--text-secondary);
-      opacity: 0.8;
-    }
-
-    .book-category {
-      display: inline-block;
-      padding: 2px 8px;
-      background: var(--bg);
-      border-radius: 4px;
-      font-size: 10px;
-      color: var(--text-secondary);
-      margin-top: 6px;
-    }
-
-    .footer {
-      padding: 16px 20px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 12px 16px;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .btn-secondary {
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .btn-secondary:hover {
-      background: var(--border);
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-hover);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Detail Panel */
-    .detail-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(4px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 24px;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s;
-      z-index: 100;
-    }
-
-    .detail-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .detail-panel {
-      width: 100%;
-      max-width: 480px;
-      max-height: 90vh;
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
-      overflow: hidden;
-      transform: translateY(20px);
-      transition: all 0.3s;
-    }
-
-    .detail-overlay.active .detail-panel {
-      transform: translateY(0);
-    }
-
-    .detail-header {
-      position: relative;
-      padding: 24px;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      color: white;
-    }
-
-    .detail-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      width: 32px;
-      height: 32px;
-      border: none;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .detail-close:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-
-    .detail-cover-section {
-      display: flex;
-      gap: 20px;
-      align-items: flex-start;
-    }
-
-    .detail-cover {
-      width: 100px;
-      height: 140px;
-      border-radius: 8px;
-      object-fit: cover;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    }
-
-    .detail-title-section {
-      flex: 1;
-    }
-
-    .detail-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      line-height: 1.4;
-    }
-
-    .detail-author {
-      font-size: 14px;
-      opacity: 0.9;
-      margin-bottom: 4px;
-    }
-
-    .detail-publisher {
-      font-size: 12px;
-      opacity: 0.7;
-    }
-
-    .detail-body {
-      padding: 24px;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-
-    .detail-section {
-      margin-bottom: 20px;
-    }
-
-    .detail-section:last-child {
-      margin-bottom: 0;
-    }
-
-    .detail-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-    }
-
-    .detail-value {
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    .detail-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .detail-tag {
-      padding: 4px 10px;
-      background: var(--bg);
-      border-radius: 6px;
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    .detail-footer {
-      padding: 16px 24px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 10px;
-    }
-
-    .detail-link {
-      color: var(--accent);
-      text-decoration: none;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .detail-link:hover {
-      text-decoration: underline;
-    }
-
-    /* Settings Panel */
-    .settings-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(4px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 24px;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s;
-      z-index: 100;
-    }
-
-    .settings-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .settings-panel {
-      width: 100%;
-      max-width: 360px;
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
-      padding: 24px;
-      transform: translateY(20px);
-      transition: all 0.3s;
-    }
-
-    .settings-overlay.active .settings-panel {
-      transform: translateY(0);
-    }
-
-    .settings-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .color-option {
-      margin-bottom: 16px;
-    }
-
-    .color-label {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    .color-input-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .color-input {
-      width: 40px;
-      height: 40px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      padding: 0;
-      overflow: hidden;
-    }
-
-    .color-input::-webkit-color-swatch-wrapper {
-      padding: 0;
-    }
-
-    .color-input::-webkit-color-swatch {
-      border: none;
-      border-radius: 8px;
-    }
-
-    .color-hex {
-      flex: 1;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 13px;
-      font-family: monospace;
-    }
-
-    .settings-actions {
-      margin-top: 24px;
-      display: flex;
-      gap: 10px;
+      color: #86868B;
     }
 
     /* Loading */
     .loading {
+      height: 100%;
       display: flex;
+      align-items: center;
       justify-content: center;
-      padding: 32px;
     }
 
     .spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
+      width: 24px;
+      height: 24px;
+      border: 2px solid #E0E0E0;
+      border-top-color: #007AFF;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
@@ -565,178 +241,208 @@
       to { transform: rotate(360deg); }
     }
 
+    /* Detail View */
+    .detail-view {
+      display: none;
+      height: 100%;
+      flex-direction: column;
+    }
+
+    .detail-view.active {
+      display: flex;
+    }
+
+    .detail-header {
+      padding: 24px;
+      display: flex;
+      gap: 20px;
+      border-bottom: 1px solid #F0F0F0;
+    }
+
+    .detail-cover {
+      width: 80px;
+      height: 112px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #F0F0F0;
+      flex-shrink: 0;
+    }
+
+    .detail-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .detail-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1D1D1F;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .detail-author {
+      font-size: 13px;
+      color: #86868B;
+      margin-bottom: 4px;
+    }
+
+    .detail-publisher {
+      font-size: 12px;
+      color: #A1A1A6;
+    }
+
+    .detail-body {
+      flex: 1;
+      padding: 20px 24px;
+      overflow-y: auto;
+    }
+
+    .detail-section {
+      margin-bottom: 20px;
+    }
+
+    .detail-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #86868B;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .detail-value {
+      font-size: 13px;
+      color: #1D1D1F;
+      line-height: 1.6;
+    }
+
+    .detail-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #F0F0F0;
+    }
+
+    .btn-add {
+      width: 100%;
+      padding: 12px;
+      background: #007AFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-add:hover {
+      background: #0066D6;
+    }
+
+    .btn-add:disabled {
+      background: #C7C7CC;
+      cursor: not-allowed;
+    }
+
     /* Toast */
     .toast {
       position: fixed;
       bottom: 24px;
       left: 50%;
       transform: translateX(-50%) translateY(100px);
-      background: var(--text);
+      background: #1D1D1F;
       color: white;
       padding: 12px 20px;
-      border-radius: var(--radius-sm);
+      border-radius: 8px;
       font-size: 13px;
-      box-shadow: var(--shadow-lg);
-      transition: all 0.3s;
-      z-index: 200;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s;
+      z-index: 100;
     }
 
     .toast.show {
       transform: translateX(-50%) translateY(0);
     }
 
-    .toast.success {
-      background: #10b981;
-    }
-
-    .toast.error {
-      background: #ef4444;
-    }
+    .toast.success { background: #34C759; }
+    .toast.error { background: #FF3B30; }
   </style>
 </head>
 
 <body>
-  <div class="widget">
-    <div class="header">
-      <div class="header-top">
-        <div class="logo">
-          <div class="logo-icon">B</div>
-          Book Search
-        </div>
-        <button class="settings-btn" onclick="openSettings()">
+  <div class="window">
+    <!-- Title Bar -->
+    <div class="titlebar">
+      <div class="traffic-lights">
+        <div class="traffic-light red"></div>
+        <div class="traffic-light yellow"></div>
+        <div class="traffic-light green"></div>
+      </div>
+      <span class="titlebar-title">Bookshelves</span>
+      <div class="titlebar-actions">
+        <button class="titlebar-btn" id="backBtn" onclick="goBack()" style="display: none;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <button class="titlebar-btn" onclick="toggleSearch()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
           </svg>
         </button>
       </div>
-      <div class="search-box">
-        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="m21 21-4.35-4.35"/>
-        </svg>
-        <input
-          type="text"
-          class="search-input"
-          id="searchInput"
-          placeholder="책 제목을 검색하세요..."
-          onkeydown="handleKeydown(event)"
-        />
-      </div>
     </div>
 
+    <!-- Search Panel -->
+    <div class="search-panel" id="searchPanel">
+      <input
+        type="text"
+        class="search-input"
+        id="searchInput"
+        placeholder="책 제목을 검색하세요..."
+        onkeydown="handleKeydown(event)"
+      />
+    </div>
+
+    <!-- Content -->
     <div class="content" id="content">
-      <div class="empty-state">
+      <div class="empty-state" id="emptyState">
         <div class="empty-icon">📚</div>
-        <div class="empty-text">책 제목을 검색해보세요</div>
+        <div class="empty-text">검색 아이콘을 눌러<br>책을 검색해보세요</div>
       </div>
-    </div>
 
-    <div class="footer" id="footer" style="display: none;">
-      <button class="btn btn-secondary" onclick="viewDetail()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-          <circle cx="12" cy="12" r="3"/>
-        </svg>
-        상세보기
-      </button>
-      <button class="btn btn-primary" id="addBtn" onclick="addToNotion()" disabled>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 5v14M5 12h14"/>
-        </svg>
-        노션에 추가
-      </button>
-    </div>
-  </div>
+      <div class="book-list" id="bookList" style="display: none;"></div>
 
-  <!-- Detail Panel -->
-  <div class="detail-overlay" id="detailOverlay" onclick="closeDetailOnOverlay(event)">
-    <div class="detail-panel">
-      <div class="detail-header">
-        <button class="detail-close" onclick="closeDetail()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
-        </button>
-        <div class="detail-cover-section">
+      <div class="loading" id="loading" style="display: none;">
+        <div class="spinner"></div>
+      </div>
+
+      <div class="detail-view" id="detailView">
+        <div class="detail-header">
           <img class="detail-cover" id="detailCover" src="" alt="">
-          <div class="detail-title-section">
+          <div class="detail-info">
             <div class="detail-title" id="detailTitle"></div>
             <div class="detail-author" id="detailAuthor"></div>
             <div class="detail-publisher" id="detailPublisher"></div>
           </div>
         </div>
-      </div>
-      <div class="detail-body">
-        <div class="detail-section" id="categorySection">
-          <div class="detail-label">장르</div>
-          <div class="detail-tags" id="detailCategory"></div>
+        <div class="detail-body">
+          <div class="detail-section" id="categorySection">
+            <div class="detail-label">장르</div>
+            <div class="detail-value" id="detailCategory"></div>
+          </div>
+          <div class="detail-section" id="descSection">
+            <div class="detail-label">소개</div>
+            <div class="detail-value" id="detailDesc"></div>
+          </div>
         </div>
-        <div class="detail-section" id="descSection">
-          <div class="detail-label">책 소개</div>
-          <div class="detail-value" id="detailDesc"></div>
+        <div class="detail-footer">
+          <button class="btn-add" onclick="addToNotion()">노션에 추가</button>
         </div>
-        <div class="detail-section">
-          <div class="detail-label">출판 정보</div>
-          <div class="detail-value" id="detailPubInfo"></div>
-        </div>
-      </div>
-      <div class="detail-footer">
-        <a class="detail-link" id="detailLink" href="#" target="_blank">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
-          </svg>
-          알라딘에서 보기
-        </a>
-        <div style="flex:1"></div>
-        <button class="btn btn-primary" onclick="addToNotion(); closeDetail();">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
-          노션에 추가
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Settings Panel -->
-  <div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsOnOverlay(event)">
-    <div class="settings-panel">
-      <div class="settings-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
-        </svg>
-        테마 설정
-      </div>
-
-      <div class="color-option">
-        <label class="color-label">배경색</label>
-        <div class="color-input-wrapper">
-          <input type="color" class="color-input" id="bgColor" value="#f5f5f7" onchange="updateColor('--bg', this.value)">
-          <input type="text" class="color-hex" id="bgHex" value="#f5f5f7" onchange="updateColorFromHex('--bg', 'bgColor', this.value)">
-        </div>
-      </div>
-
-      <div class="color-option">
-        <label class="color-label">카드색</label>
-        <div class="color-input-wrapper">
-          <input type="color" class="color-input" id="cardColor" value="#ffffff" onchange="updateColor('--card', this.value)">
-          <input type="text" class="color-hex" id="cardHex" value="#ffffff" onchange="updateColorFromHex('--card', 'cardColor', this.value)">
-        </div>
-      </div>
-
-      <div class="color-option">
-        <label class="color-label">포인트색</label>
-        <div class="color-input-wrapper">
-          <input type="color" class="color-input" id="accentColor" value="#6366f1" onchange="updateColor('--accent', this.value)">
-          <input type="text" class="color-hex" id="accentHex" value="#6366f1" onchange="updateColorFromHex('--accent', 'accentColor', this.value)">
-        </div>
-      </div>
-
-      <div class="settings-actions">
-        <button class="btn btn-secondary" onclick="resetTheme()">초기화</button>
-        <button class="btn btn-primary" onclick="closeSettings()">확인</button>
       </div>
     </div>
   </div>
@@ -747,8 +453,16 @@
   <script>
     let books = [];
     let selectedBook = null;
+    let currentView = 'list';
 
-    // Search
+    function toggleSearch() {
+      const panel = document.getElementById('searchPanel');
+      panel.classList.toggle('active');
+      if (panel.classList.contains('active')) {
+        document.getElementById('searchInput').focus();
+      }
+    }
+
     function handleKeydown(e) {
       if (e.key === 'Enter') {
         searchBooks();
@@ -759,76 +473,90 @@
       const query = document.getElementById('searchInput').value.trim();
       if (!query) return;
 
-      document.getElementById('content').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-      document.getElementById('footer').style.display = 'none';
+      showLoading();
 
       try {
         const res = await fetch(`/search?query=${encodeURIComponent(query)}`);
         books = await res.json();
-        selectedBook = null;
 
-        if (books.length === 0) {
-          document.getElementById('content').innerHTML = `
-            <div class="empty-state">
-              <div class="empty-icon">🔍</div>
-              <div class="empty-text">검색 결과가 없습니다</div>
-            </div>
-          `;
+        if (books.error || books.length === 0) {
+          showEmpty('검색 결과가 없습니다');
           return;
         }
 
         renderBooks();
-        document.getElementById('footer').style.display = 'flex';
-        document.getElementById('addBtn').disabled = true;
       } catch (err) {
-        document.getElementById('content').innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">⚠️</div>
-            <div class="empty-text">검색 중 오류가 발생했습니다</div>
-          </div>
-        `;
+        console.error('Search error:', err);
+        showEmpty('검색 중 오류가 발생했습니다');
       }
     }
 
+    function showLoading() {
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('bookList').style.display = 'none';
+      document.getElementById('detailView').classList.remove('active');
+      document.getElementById('loading').style.display = 'flex';
+      document.getElementById('backBtn').style.display = 'none';
+      currentView = 'list';
+    }
+
+    function showEmpty(message) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('bookList').style.display = 'none';
+      document.getElementById('detailView').classList.remove('active');
+      document.getElementById('emptyState').style.display = 'flex';
+      document.getElementById('emptyState').innerHTML = `
+        <div class="empty-icon">🔍</div>
+        <div class="empty-text">${message}</div>
+      `;
+      document.getElementById('backBtn').style.display = 'none';
+      currentView = 'list';
+    }
+
     function renderBooks() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('detailView').classList.remove('active');
+      document.getElementById('bookList').style.display = 'block';
+      document.getElementById('backBtn').style.display = 'none';
+      currentView = 'list';
+
       const html = books.map((book, i) => `
-        <div class="book-item ${selectedBook === book ? 'selected' : ''}" onclick="selectBook(${i})">
-          <img class="book-cover" src="${book.cover || 'https://via.placeholder.com/56x80?text=No+Image'}" alt="${book.title}">
+        <div class="book-item" onclick="selectBook(${i})">
+          <img class="book-cover" src="${book.cover || ''}" alt="" onerror="this.style.background='#F0F0F0'">
           <div class="book-info">
             <div class="book-title">${book.title}</div>
             <div class="book-author">${book.author}</div>
-            <div class="book-meta">${book.publisher || ''} ${book.pubDate ? '· ' + book.pubDate : ''}</div>
-            ${book.categoryName ? `<span class="book-category">${book.categoryName.split('>').pop()}</span>` : ''}
           </div>
         </div>
       `).join('');
 
-      document.getElementById('content').innerHTML = `<div class="results">${html}</div>`;
+      document.getElementById('bookList').innerHTML = html;
     }
 
     function selectBook(index) {
       selectedBook = books[index];
-      document.getElementById('addBtn').disabled = false;
-      renderBooks();
+      showDetail();
     }
 
-    // Detail Panel
-    function viewDetail() {
-      if (!selectedBook) {
-        showToast('책을 먼저 선택해주세요', 'error');
-        return;
-      }
+    function showDetail() {
+      if (!selectedBook) return;
 
-      document.getElementById('detailCover').src = selectedBook.cover || 'https://via.placeholder.com/100x140?text=No+Image';
+      document.getElementById('bookList').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('detailView').classList.add('active');
+      document.getElementById('backBtn').style.display = 'block';
+      currentView = 'detail';
+
+      document.getElementById('detailCover').src = selectedBook.cover || '';
       document.getElementById('detailTitle').textContent = selectedBook.title;
       document.getElementById('detailAuthor').textContent = selectedBook.author;
-      document.getElementById('detailPublisher').textContent = selectedBook.publisher || '';
+      document.getElementById('detailPublisher').textContent =
+        `${selectedBook.publisher || ''} ${selectedBook.pubDate ? '· ' + selectedBook.pubDate : ''}`;
 
       if (selectedBook.categoryName) {
-        const categories = selectedBook.categoryName.split('>');
-        document.getElementById('detailCategory').innerHTML = categories.map(c =>
-          `<span class="detail-tag">${c.trim()}</span>`
-        ).join('');
+        document.getElementById('detailCategory').textContent = selectedBook.categoryName;
         document.getElementById('categorySection').style.display = 'block';
       } else {
         document.getElementById('categorySection').style.display = 'none';
@@ -840,31 +568,16 @@
       } else {
         document.getElementById('descSection').style.display = 'none';
       }
-
-      document.getElementById('detailPubInfo').textContent =
-        `${selectedBook.publisher || '출판사 정보 없음'} · ${selectedBook.pubDate || '출판일 정보 없음'}`;
-
-      document.getElementById('detailLink').href = selectedBook.link || '#';
-
-      document.getElementById('detailOverlay').classList.add('active');
     }
 
-    function closeDetail() {
-      document.getElementById('detailOverlay').classList.remove('active');
-    }
-
-    function closeDetailOnOverlay(e) {
-      if (e.target === e.currentTarget) {
-        closeDetail();
+    function goBack() {
+      if (currentView === 'detail') {
+        renderBooks();
       }
     }
 
-    // Add to Notion
     async function addToNotion() {
-      if (!selectedBook) {
-        showToast('책을 먼저 선택해주세요', 'error');
-        return;
-      }
+      if (!selectedBook) return;
 
       try {
         const res = await fetch('/addBook', {
@@ -878,102 +591,19 @@
         if (data.ok) {
           showToast('노션에 추가되었습니다!', 'success');
         } else {
-          showToast(data.error || '추가에 실패했습니다', 'error');
+          showToast(data.error || '추가 실패', 'error');
         }
       } catch (err) {
-        showToast('추가 중 오류가 발생했습니다', 'error');
+        showToast('추가 중 오류 발생', 'error');
       }
     }
 
-    // Settings
-    function openSettings() {
-      document.getElementById('settingsOverlay').classList.add('active');
-    }
-
-    function closeSettings() {
-      document.getElementById('settingsOverlay').classList.remove('active');
-      saveTheme();
-    }
-
-    function closeSettingsOnOverlay(e) {
-      if (e.target === e.currentTarget) {
-        closeSettings();
-      }
-    }
-
-    function updateColor(varName, value) {
-      document.documentElement.style.setProperty(varName, value);
-      const hexInput = document.getElementById(varName.replace('--', '') + 'Hex');
-      if (hexInput) hexInput.value = value;
-    }
-
-    function updateColorFromHex(varName, colorInputId, value) {
-      if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-        document.documentElement.style.setProperty(varName, value);
-        document.getElementById(colorInputId).value = value;
-      }
-    }
-
-    function resetTheme() {
-      const defaults = {
-        '--bg': '#f5f5f7',
-        '--card': '#ffffff',
-        '--accent': '#6366f1'
-      };
-
-      Object.entries(defaults).forEach(([varName, value]) => {
-        document.documentElement.style.setProperty(varName, value);
-      });
-
-      document.getElementById('bgColor').value = defaults['--bg'];
-      document.getElementById('bgHex').value = defaults['--bg'];
-      document.getElementById('cardColor').value = defaults['--card'];
-      document.getElementById('cardHex').value = defaults['--card'];
-      document.getElementById('accentColor').value = defaults['--accent'];
-      document.getElementById('accentHex').value = defaults['--accent'];
-
-      localStorage.removeItem('bookWidgetTheme');
-    }
-
-    function saveTheme() {
-      const theme = {
-        '--bg': getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
-        '--card': getComputedStyle(document.documentElement).getPropertyValue('--card').trim(),
-        '--accent': getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
-      };
-      localStorage.setItem('bookWidgetTheme', JSON.stringify(theme));
-    }
-
-    function loadTheme() {
-      const saved = localStorage.getItem('bookWidgetTheme');
-      if (saved) {
-        const theme = JSON.parse(saved);
-        Object.entries(theme).forEach(([varName, value]) => {
-          document.documentElement.style.setProperty(varName, value);
-        });
-
-        document.getElementById('bgColor').value = theme['--bg'];
-        document.getElementById('bgHex').value = theme['--bg'];
-        document.getElementById('cardColor').value = theme['--card'];
-        document.getElementById('cardHex').value = theme['--card'];
-        document.getElementById('accentColor').value = theme['--accent'];
-        document.getElementById('accentHex').value = theme['--accent'];
-      }
-    }
-
-    // Toast
     function showToast(message, type = '') {
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.className = 'toast show ' + type;
-
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
-
-    // Init
-    loadTheme();
   </script>
 </body>
 </html>
