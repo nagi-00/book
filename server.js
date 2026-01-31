@@ -16,6 +16,11 @@ app.use(express.static(__dirname));
 // 도서 검색 API
 app.get("/search", async (req, res) => {
   const q = req.query.query;
+
+  if (!q) {
+    return res.status(400).json({ error: "검색어를 입력해주세요" });
+  }
+
   const url =
     "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
     `?ttbkey=${process.env.ALADIN_TTB_KEY}` +
@@ -24,7 +29,19 @@ app.get("/search", async (req, res) => {
 
   try {
     const r = await fetch(url);
-    const data = await r.json();
+    const text = await r.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      const match = text.match(/\{[\s\S]*\}/);
+      if (match) {
+        data = JSON.parse(match[0]);
+      } else {
+        throw new Error("Invalid response format");
+      }
+    }
 
     const books = (data.item || []).map(b => ({
       isbn: b.isbn13 || b.isbn,
@@ -45,49 +62,35 @@ app.get("/search", async (req, res) => {
   }
 });
 
-// 도서 상세 정보 API
-app.get("/detail", async (req, res) => {
-  const isbn = req.query.isbn;
-  const url =
-    "https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx" +
-    `?ttbkey=${process.env.ALADIN_TTB_KEY}` +
-    `&itemIdType=ISBN13&ItemId=${isbn}` +
-    "&output=js&Version=20131101&OptResult=ebookList,usedList,reviewList";
-
-  try {
-    const r = await fetch(url);
-    const data = await r.json();
-    const b = data.item?.[0];
-
-    if (!b) {
-      return res.status(404).json({ error: "책을 찾을 수 없습니다" });
-    }
-
-    res.json({
-      isbn: b.isbn13 || b.isbn,
-      title: b.title,
-      author: b.author,
-      publisher: b.publisher,
-      pubDate: b.pubDate,
-      cover: b.cover?.replace("coversum", "cover500") || b.cover,
-      description: b.description,
-      categoryName: b.categoryName,
-      link: b.link,
-      priceStandard: b.priceStandard,
-      priceSales: b.priceSales,
-      customerReviewRank: b.customerReviewRank
-    });
-  } catch (err) {
-    console.error("Detail error:", err);
-    res.status(500).json({ error: "상세 정보 로드 실패" });
-  }
-});
-
 // 노션에 도서 추가
 app.post("/addBook", async (req, res) => {
-  const { isbn, title, author, publisher, pubDate, cover, description, categoryName, link } = req.body;
+  const { title, author, cover, description } = req.body;
 
   try {
+    const properties = {
+      "title": {
+        title: [{ text: { content: title || "" } }]
+      },
+      "author": {
+        rich_text: [{ text: { content: author || "" } }]
+      }
+    };
+
+    // cover는 파일과 미디어 (files) 타입
+    if (cover) {
+      properties["cover"] = {
+        files: [
+          {
+            type: "external",
+            name: "cover.jpg",
+            external: {
+              url: cover
+            }
+          }
+        ]
+      };
+    }
+
     const response = await fetch("https://api.notion.com/v1/pages", {
       method: "POST",
       headers: {
@@ -101,29 +104,7 @@ app.post("/addBook", async (req, res) => {
           type: "external",
           external: { url: cover }
         } : undefined,
-        properties: {
-          "이름": {
-            title: [{ text: { content: title || "" } }]
-          },
-          "저자": {
-            rich_text: [{ text: { content: author || "" } }]
-          },
-          "출판사": {
-            rich_text: [{ text: { content: publisher || "" } }]
-          },
-          "출판일": pubDate ? {
-            date: { start: pubDate }
-          } : undefined,
-          "장르": {
-            rich_text: [{ text: { content: categoryName || "" } }]
-          },
-          "ISBN": {
-            rich_text: [{ text: { content: isbn || "" } }]
-          },
-          "링크": link ? {
-            url: link
-          } : undefined
-        },
+        properties: properties,
         children: description ? [
           {
             object: "block",
